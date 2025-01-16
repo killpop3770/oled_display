@@ -15,6 +15,8 @@ use embedded_graphics::{
     prelude::Point,
 };
 use panic_halt as _;
+use rand::rngs::SmallRng;
+use rand::{RngCore, SeedableRng};
 use ssd1306::{prelude::*, I2CDisplayInterface, Ssd1306};
 use stm32f1xx_hal::{
     i2c::{BlockingI2c, DutyCycle, Mode},
@@ -107,38 +109,47 @@ fn main() -> ! {
 
     // display.flush().unwrap();
 
+    // display.init().unwrap();
+
+    // let y_offset = 16;
+
+    // let text_style = MonoTextStyleBuilder::new()
+    //     .font(&FONT_6X10)
+    //     .text_color(BinaryColor::On)
+    //     .build();
+
+    // Text::with_baseline("=============", Point::new(0, 0), text_style, Baseline::Top)
+    //     .draw(&mut display)
+    //     .unwrap();
+
+    // Text::with_baseline(
+    //     "Hello world!",
+    //     Point::new(0, y_offset),
+    //     text_style,
+    //     Baseline::Top,
+    // )
+    // .draw(&mut display)
+    // .unwrap();
+
+    // Text::with_baseline(
+    //     "=============",
+    //     Point::new(0, y_offset * 2),
+    //     text_style,
+    //     Baseline::Top,
+    // )
+    // .draw(&mut display)
+    // .unwrap();
+    // display.flush().unwrap();
+    // loop {}
+
+    // using noise https://en.wikipedia.org/wiki/Hexspeak
     display.init().unwrap();
+    let mut buf = [0x00u8; 1024];
+    let mut rng = SmallRng::seed_from_u64(0xdead_beef_cafe_d00d);
+    loop {
+        rng.fill_bytes(&mut buf);
+        
+        display.draw(&buf).unwrap();
+    }
 
-    let y_offset = 16;
-
-    let text_style = MonoTextStyleBuilder::new()
-        .font(&FONT_6X10)
-        .text_color(BinaryColor::On)
-        .build();
-
-    Text::with_baseline("=============", Point::new(0, 0), text_style, Baseline::Top)
-        .draw(&mut display)
-        .unwrap();
-
-    Text::with_baseline(
-        "Hello world!",
-        Point::new(0, y_offset),
-        text_style,
-        Baseline::Top,
-    )
-    .draw(&mut display)
-    .unwrap();
-
-    Text::with_baseline(
-        "=============",
-        Point::new(0, y_offset * 2),
-        text_style,
-        Baseline::Top,
-    )
-    .draw(&mut display)
-    .unwrap();
-
-    display.flush().unwrap();
-
-    loop {}
 }
